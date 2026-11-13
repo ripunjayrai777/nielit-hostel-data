@@ -106,4 +106,6 @@ async function setComp(id,status){await api('/api/complaints/'+id,{method:'POST'
 async function saveFee(r){await api('/api/fees',{method:'POST',body:{roll:r,sem:window.SEM||1,paid:$('#p_'+r).checked,receipt:$('#r_'+r).value,date:$('#d_'+r).value,amount:$('#a_'+r).value}});toast('Saved')}
 async function dlFee(){const f=await api('/api/fees'),sem=window.SEM||1,m={};f.filter(x=>x.sem==sem).forEach(x=>m[x.roll]=x);csv(`fee-sem${sem}.csv`,[['Room','Name','Roll','Paid','Receipt','Date','Amount'],...filt().map(s=>[s.room,s.name,noRoll(s)?'':s.roll,m[s.roll]?'Yes':'No',m[s.roll]?.receipt,m[s.roll]?.date,m[s.roll]?.amount])])}
 tok()?init().catch(()=>{}):showLogin();
-</script></body></html>
+</script>
+   <script src="camera.js"></script>
+</body></html>

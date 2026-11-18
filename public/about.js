@@ -12,7 +12,16 @@
 //     menuTitle: 'Mess menu 2026',
 //     fees: [{ label: '', amount: 12000 }, { label: '', amount: 15000 }],   // label example: 'Double sharing'
 //     messAmount: 3200,
-//     contacts: []                     // example: [{ label: 'Warden', value: '98xxxxxx12' }]
+//     contacts: [],                    // example: [{ label: 'Office', value: '0551-xxxxxxx' }]
+//     director: {
+//       name: 'Dr. Anurag Gupta', role: 'Director-in-Charge', photo: '/director.jpg',   // photo: public/director.jpg
+//       draft: true,   // set to false after the Director-in-Charge approves the message below
+//       message: 'Welcome to the NIELIT Gorakhpur Boys Hostel. The hostel is a home away from home for our students, and our aim is to give every resident a safe, disciplined and supportive environment in which to learn and grow. I encourage all residents to follow the hostel rules, respect one another and make full use of the opportunities the campus offers.'
+//     },
+//     staff: [
+//       { title: 'Hostel Warden', name: 'Ritesh Pratap Rao', role: "Sc 'C'", photo: '/warden.jpg', phone: '' },          // photo: public/warden.jpg
+//       { title: 'Assistant Hostel Warden', name: 'Neeraj Kumar', role: 'STA', photo: '/asst-warden.jpg', phone: '' }   // photo: public/asst-warden.jpg
+//     ]
 //   };
 //   const q = s => document.querySelector(s);
 //   const inr = n => '\u20B9' + Number(n).toLocaleString('en-IN');
@@ -24,10 +33,18 @@
 // .tile b{display:block;font:800 26px/1.1 'Bricolage Grotesque',sans-serif}.tile span{font-size:13px;color:var(--mu)}
 // .mnu{width:100%;border-radius:10px;border:1px solid var(--bd);display:block}.abtn{display:inline-flex;align-items:center;text-decoration:none;min-height:38px;padding:0 14px;border-radius:9px;font-weight:700;font-size:14px}
 // .abtn.p{background:var(--pr);color:#fff}.abtn.g{border:1px solid var(--bd);color:var(--lk)}.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+// .pcard{display:flex;gap:16px;align-items:flex-start}.pcard .pt{flex:1;min-width:0}
+// .pimg,.avt{flex:none;width:112px;aspect-ratio:3/4;border-radius:12px;object-fit:cover;border:1px solid var(--bd);background:var(--sel)}.pimg.lg,.avt.lg{width:136px}
+// .avt{display:grid;place-items:center;color:var(--lk);font:800 28px 'Bricolage Grotesque',sans-serif}
+// .pname{font:700 16px 'Bricolage Grotesque',sans-serif}.prole{color:var(--mu);font-size:13.5px}.pg{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+// .msg{margin:0;line-height:1.65;border-left:3px solid var(--lk);padding-left:12px}
+// @media(max-width:420px){.pimg,.avt{width:92px}.pimg.lg,.avt.lg{width:104px}.pcard{gap:12px}}
 // @media(max-width:420px){nav button{font-size:9.5px}nav svg{width:19px;height:19px}}
 // </style>`);
 //   if (!TABS.some(t => t[0] === 'about')) TABS.push(['about', 'Hostel']);
 //   ICON.about = '<path d="M4 21V5l8-2 8 2v16"/><path d="M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2"/>';
+//   const ini = n => n.replace(/^(dr|mr|mrs|ms)\.?\s+/i, '').split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+//   const pic = (p, lg) => `<img class="pimg ${lg ? 'lg' : ''}" src="${E(p.photo)}" alt="${E(p.name)}" onerror="this.outerHTML='<div class=&quot;avt ${lg ? 'lg' : ''}&quot;>${ini(p.name)}</div>'">`;
 //   const nav = q('#nav');
 //   if (nav && nav.children.length) {
 //     nav.innerHTML = TABS.map(t => `<button id="n_${t[0]}" onclick="go('${t[0]}')"><svg viewBox="0 0 24 24">${ICON[t[0]]}</svg><span>${t[1]}</span></button>`).join('');
@@ -35,8 +52,11 @@
 //   }
 //   V.about = async function () {
 //     const rooms = new Set(S.map(s => s.room).filter(Boolean)).size, batches = [...new Set(S.map(s => s.batch).filter(Boolean))].sort();
-//     const A = ABOUT;
+//     const A = ABOUT, D = A.director;
+//     const desk = `<div class="card"><b>From the desk of the Director-in-Charge</b><div class="pcard" style="margin-top:12px"><div class="pt"><p class="msg">${E(D.message)}</p><div style="margin-top:14px"><div class="pname">${E(D.name)}</div><div class="prole">${E(D.role)}</div></div>${D.draft ? '<p class="mu" style="margin:10px 0 0">Draft message, to be confirmed by the Director-in-Charge.</p>' : ''}</div>${pic(D, 1)}</div></div>`;
+//     const staff = `<div class="card"><b>Hostel administration</b><div class="pg" style="margin-top:12px">${A.staff.map(p => `<div class="pcard"><div class="pt"><div class="prole">${E(p.title)}</div><div class="pname">${E(p.name)}</div><div class="prole">${E(p.role)}</div>${p.phone ? `<p style="margin:8px 0 0"><a href="tel:${E(p.phone)}">${E(p.phone)}</a></p>` : ''}</div>${pic(p)}</div>`).join('')}</div></div>`;
 //     q('#main').innerHTML = `<div class="ah"><img src="${A.image}" alt="${E(A.title)}" onerror="this.remove()"><div class="ahc"><h2>${E(A.title)}</h2><p>${E(A.subtitle)}</p></div></div>
+// ${desk}${staff}
 // <div class="card"><b>At a glance</b><div class="tiles" style="margin-top:10px"><div class="tile"><b>${S.length}</b><span>Residents</span></div><div class="tile"><b>${rooms}</b><span>Rooms occupied</span></div>${batches.length ? `<div class="tile"><b>${batches.length}</b><span>Batches (${E(batches.join(', '))})</span></div>` : ''}</div></div>
 // <div class="card"><b>Fee structure</b><div class="tiles" style="margin-top:10px">${A.fees.map(f => `<div class="tile"><b>${inr(f.amount)}</b><span>per semester${f.label ? ', ' + E(f.label) : ''}</span></div>`).join('')}<div class="tile"><b>${inr(A.messAmount)}</b><span>mess charges per month</span></div></div></div>
 // ${A.contacts.length ? `<div class="card"><b>Contact</b>${A.contacts.map(c => `<p style="margin:8px 0 0"><span class="mu">${E(c.label)}</span><br>${E(c.value)}</p>`).join('')}</div>` : ''}
@@ -47,6 +67,8 @@
 //     box.innerHTML = ok ? `<a class="abtn p" href="${A.rules}" target="_blank" rel="noopener">View PDF</a><a class="abtn g" href="${A.rules}" download="NIELIT-Hostel-Rules.pdf">Download PDF</a>` : `<span class="mu">The rules PDF is not added yet. Save it as public/hostel-rules.pdf and deploy.</span>`;
 //   };
 // })();
+
+
 
 /* "Hostel" tab: hostel photo, at-a-glance numbers, fee structure, mess charges,
    rules and regulations (PDF view/download) and the mess menu (image view/download).
@@ -89,6 +111,7 @@
 .pname{font:700 16px 'Bricolage Grotesque',sans-serif}.prole{color:var(--mu);font-size:13.5px}.pg{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .msg{margin:0;line-height:1.65;border-left:3px solid var(--lk);padding-left:12px}
 @media(max-width:420px){.pimg,.avt{width:92px}.pimg.lg,.avt.lg{width:104px}.pcard{gap:12px}}
+@media(max-width:899px){nav{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav button{flex:1 0 auto;min-width:46px;padding:8px 6px 7px;white-space:nowrap}}
 @media(max-width:420px){nav button{font-size:9.5px}nav svg{width:19px;height:19px}}
 </style>`);
   if (!TABS.some(t => t[0] === 'about')) TABS.push(['about', 'Hostel']);
@@ -100,6 +123,12 @@
     nav.innerHTML = TABS.map(t => `<button id="n_${t[0]}" onclick="go('${t[0]}')"><svg viewBox="0 0 24 24">${ICON[t[0]]}</svg><span>${t[1]}</span></button>`).join('');
     const b = q('#n_' + tab); if (b) b.classList.add('on');
   }
+  const goOrig = window.go;
+  window.go = async function (t) {   // keep the active tab visible in the scrollable mobile nav
+    await goOrig(t);
+    const n = q('#nav'), b = q('#n_' + t);
+    if (n && b && n.scrollWidth > n.clientWidth) n.scrollTo({ left: n.scrollLeft + b.getBoundingClientRect().left + b.offsetWidth / 2 - n.clientWidth / 2, behavior: 'smooth' });
+  };
   V.about = async function () {
     const rooms = new Set(S.map(s => s.room).filter(Boolean)).size, batches = [...new Set(S.map(s => s.batch).filter(Boolean))].sort();
     const A = ABOUT, D = A.director;
@@ -117,4 +146,3 @@ ${A.contacts.length ? `<div class="card"><b>Contact</b>${A.contacts.map(c => `<p
     box.innerHTML = ok ? `<a class="abtn p" href="${A.rules}" target="_blank" rel="noopener">View PDF</a><a class="abtn g" href="${A.rules}" download="NIELIT-Hostel-Rules.pdf">Download PDF</a>` : `<span class="mu">The rules PDF is not added yet. Save it as public/hostel-rules.pdf and deploy.</span>`;
   };
 })();
-

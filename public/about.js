@@ -39,6 +39,7 @@
 // .pname{font:700 16px 'Bricolage Grotesque',sans-serif}.prole{color:var(--mu);font-size:13.5px}.pg{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 // .msg{margin:0;line-height:1.65;border-left:3px solid var(--lk);padding-left:12px}
 // @media(max-width:420px){.pimg,.avt{width:92px}.pimg.lg,.avt.lg{width:104px}.pcard{gap:12px}}
+// @media(max-width:899px){nav{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav button{flex:1 0 auto;min-width:46px;padding:8px 6px 7px;white-space:nowrap}}
 // @media(max-width:420px){nav button{font-size:9.5px}nav svg{width:19px;height:19px}}
 // </style>`);
 //   if (!TABS.some(t => t[0] === 'about')) TABS.push(['about', 'Hostel']);
@@ -50,6 +51,12 @@
 //     nav.innerHTML = TABS.map(t => `<button id="n_${t[0]}" onclick="go('${t[0]}')"><svg viewBox="0 0 24 24">${ICON[t[0]]}</svg><span>${t[1]}</span></button>`).join('');
 //     const b = q('#n_' + tab); if (b) b.classList.add('on');
 //   }
+//   const goOrig = window.go;
+//   window.go = async function (t) {   // keep the active tab visible in the scrollable mobile nav
+//     await goOrig(t);
+//     const n = q('#nav'), b = q('#n_' + t);
+//     if (n && b && n.scrollWidth > n.clientWidth) n.scrollTo({ left: n.scrollLeft + b.getBoundingClientRect().left + b.offsetWidth / 2 - n.clientWidth / 2, behavior: 'smooth' });
+//   };
 //   V.about = async function () {
 //     const rooms = new Set(S.map(s => s.room).filter(Boolean)).size, batches = [...new Set(S.map(s => s.batch).filter(Boolean))].sort();
 //     const A = ABOUT, D = A.director;
@@ -69,7 +76,6 @@
 // })();
 
 
-
 /* "Hostel" tab: hostel photo, at-a-glance numbers, fee structure, mess charges,
    rules and regulations (PDF view/download) and the mess menu (image view/download).
    Add a script tag with src="about.js" before the closing body tag in public/index.html */
@@ -80,6 +86,7 @@
     subtitle: 'Gorakhpur Campus',
     image: '/hostel.jpg',            // put the hostel photo in public/hostel.jpg
     rules: '/hostel-rules.pdf',      // put the rules PDF in public/hostel-rules.pdf
+    sop: '/hostel-refund-sop.pdf',   // put the refund SOP in public/hostel-refund-sop.pdf
     menu: '/mess-menu.jpg',          // mess menu image in public/mess-menu.jpg
     menuTitle: 'Mess menu 2026',
     fees: [{ label: '', amount: 12000 }, { label: '', amount: 15000 }],   // label example: 'Double sharing'
@@ -104,7 +111,7 @@
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.tile{background:var(--sel);border-radius:10px;padding:12px}
 .tile b{display:block;font:800 26px/1.1 'Bricolage Grotesque',sans-serif}.tile span{font-size:13px;color:var(--mu)}
 .mnu{width:100%;border-radius:10px;border:1px solid var(--bd);display:block}.abtn{display:inline-flex;align-items:center;text-decoration:none;min-height:38px;padding:0 14px;border-radius:9px;font-weight:700;font-size:14px}
-.abtn.p{background:var(--pr);color:#fff}.abtn.g{border:1px solid var(--bd);color:var(--lk)}.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sopl{margin:12px 0 0;padding-left:18px;line-height:1.6;font-size:14px}.abtn.p{background:var(--pr);color:#fff}.abtn.g{border:1px solid var(--bd);color:var(--lk)}.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .pcard{display:flex;gap:16px;align-items:flex-start}.pcard .pt{flex:1;min-width:0}
 .pimg,.avt{flex:none;width:112px;aspect-ratio:3/4;border-radius:12px;object-fit:cover;border:1px solid var(--bd);background:var(--sel)}.pimg.lg,.avt.lg{width:136px}
 .avt{display:grid;place-items:center;color:var(--lk);font:800 28px 'Bricolage Grotesque',sans-serif}
@@ -140,9 +147,15 @@ ${desk}${staff}
 <div class="card"><b>Fee structure</b><div class="tiles" style="margin-top:10px">${A.fees.map(f => `<div class="tile"><b>${inr(f.amount)}</b><span>per semester${f.label ? ', ' + E(f.label) : ''}</span></div>`).join('')}<div class="tile"><b>${inr(A.messAmount)}</b><span>mess charges per month</span></div></div></div>
 ${A.contacts.length ? `<div class="card"><b>Contact</b>${A.contacts.map(c => `<p style="margin:8px 0 0"><span class="mu">${E(c.label)}</span><br>${E(c.value)}</p>`).join('')}</div>` : ''}
 <div class="card"><b>Rules and regulations</b><p class="mu" style="margin:6px 0 0">Official hostel rules for residents.</p><div class="acts" id="rulesActs"></div></div>
+<div class="card"><b>Hostel fee refund SOP</b><p class="mu" style="margin:6px 0 10px">Refund of hostel fee when a student vacates the hostel before the semester ends. The date of hostel allotment decides the category.</p>
+<div class="tbl"><table><tr><th>Category</th><th>Withdrawal</th><th>Hostel fee refund</th></tr><tr><td>I</td><td>Within 10 days of allotment</td><td>Fee paid minus ₹1,000 processing fee</td></tr><tr><td>II</td><td>After 10 days, up to 45 days</td><td>Fee paid minus ₹1,000 processing fee and two months' hostel charge</td></tr><tr><td>III</td><td>After 45 days</td><td>No refund of hostel fee</td></tr></table></div>
+<ul class="sopl"><li>Security deposit / caution money is refunded in every category, only after a valid No Dues Certificate and clearing any dues or damages.</li><li>Claim with: withdrawal application, fee receipt, No Dues Certificate and bank account details.</li><li>The Hostel Warden verifies occupancy and dues, Accounts calculates the refund, and it is paid by bank transfer after approval of the Competent Authority.</li><li>Days are counted from the allotment date to the date the Institute receives the application.</li></ul><div class="acts" id="sopActs"></div></div>
 <div class="card"><b>${E(A.menuTitle)}</b><div style="margin-top:10px"><a href="${A.menu}" target="_blank" rel="noopener"><img class="mnu" src="${A.menu}" alt="${E(A.menuTitle)}" loading="lazy"></a></div><div class="acts"><a class="abtn p" href="${A.menu}" target="_blank" rel="noopener">Open full size</a><a class="abtn g" href="${A.menu}" download="NIELIT-Mess-Menu-2026.jpg">Download</a></div></div>`;
     let ok = false; try { ok = (await fetch(A.rules, { method: 'HEAD' })).ok; } catch (e) {}
     const box = q('#rulesActs'); if (!box) return;
+    const head = async u => { try { return (await fetch(u, { method: 'HEAD' })).ok; } catch (e) { return false; } };
     box.innerHTML = ok ? `<a class="abtn p" href="${A.rules}" target="_blank" rel="noopener">View PDF</a><a class="abtn g" href="${A.rules}" download="NIELIT-Hostel-Rules.pdf">Download PDF</a>` : `<span class="mu">The rules PDF is not added yet. Save it as public/hostel-rules.pdf and deploy.</span>`;
+    const ok2 = await head(A.sop), b2 = q('#sopActs');
+    if (b2) b2.innerHTML = ok2 ? `<a class="abtn p" href="${A.sop}" target="_blank" rel="noopener">View SOP (PDF)</a><a class="abtn g" href="${A.sop}" download="NIELIT-Hostel-Fee-Refund-SOP.pdf">Download SOP</a>` : '<span class="mu">The SOP PDF is not added yet. Save it as public/hostel-refund-sop.pdf and deploy.</span>';
   };
 })();
